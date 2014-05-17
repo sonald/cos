@@ -7,6 +7,7 @@ global start
 global gdt_flush
 global idt_flush
 extern isr_handler
+extern irq_handler
 extern main
 
 ; This part MUST be 4byte aligned, so we solve that issue using 'ALIGN 4'
@@ -78,6 +79,44 @@ isr%1:
     jmp isr_stub
 %endmacro
 
+%macro def_irq 2
+global irq%1
+irq%1:
+    cli ; seems unneccesary cause I use int-gate
+    push 0
+    push %2
+    jmp irq_stub
+%endmacro
+
+%macro handler_stub 2
+%1:
+    pusha ; this will do pushad
+
+    mov ax, ds
+    push eax
+
+    mov ax, 0x10
+    mov ds, ax
+    mov es, ax
+    ;mov ss, ax ; why not ss
+    mov gs, ax
+    mov fs, ax
+
+    call %2
+
+    pop eax
+    mov ds, ax
+    mov es, ax
+    ;mov ss, ax ; why not ss
+    mov gs, ax
+    mov fs, ax
+
+    popa
+    add esp, 8
+    sti
+    iret
+%endmacro
+
 isr_noerrcode 0
 isr_noerrcode 1
 isr_noerrcode 2
@@ -111,31 +150,25 @@ isr_noerrcode 29
 isr_noerrcode 30
 isr_noerrcode 31
 
+handler_stub isr_stub, isr_handler
 
-isr_stub:
-    pusha ; this will do pushad
+; master PIC
+def_irq 0, 32
+def_irq 1, 33
+def_irq 2, 34
+def_irq 3, 35
+def_irq 4, 36
+def_irq 5, 37
+def_irq 6, 38
+def_irq 7, 39
+; slave PIC
+def_irq 8, 40
+def_irq 9, 41
+def_irq 10, 42
+def_irq 11, 43
+def_irq 12, 44
+def_irq 13, 45
+def_irq 14, 46
+def_irq 15, 47
 
-    mov ax, ds
-    push eax
-
-    mov ax, 0x10
-    mov ds, ax
-    mov es, ax
-    ;mov ss, ax ; why not ss
-    mov gs, ax
-    mov fs, ax
-
-    call isr_handler
-
-    pop eax
-    mov ds, ax
-    mov es, ax
-    ;mov ss, ax ; why not ss
-    mov gs, ax
-    mov fs, ax
-
-    popa
-    add esp, 8
-    sti
-    iret
-
+handler_stub irq_stub, irq_handler

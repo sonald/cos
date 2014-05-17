@@ -27,49 +27,34 @@ void init_gdt()
     gdt_flush((u32)&gdt_ptr);
 }
 
-// These extern directives let us access the addresses of our ASM ISR handlers.
-extern void isr0();
-extern void isr1();
-extern void isr2();
-extern void isr3();
-extern void isr4();
-extern void isr5();
-extern void isr6();
-extern void isr7();
-extern void isr8();
-extern void isr9();
-extern void isr10();
-extern void isr11();
-extern void isr12();
-extern void isr13();
-extern void isr14();
-extern void isr15();
-extern void isr16();
-extern void isr17();
-extern void isr18();
-extern void isr19();
-extern void isr20();
-extern void isr21();
-extern void isr22();
-extern void isr23();
-extern void isr24();
-extern void isr25();
-extern void isr26();
-extern void isr27();
-extern void isr28();
-extern void isr29();
-extern void isr30();
-extern void isr31();
-
 #define SETUP_GATE(i) \
+    extern void isr##i(); \
     setup_idt_entry(i, (u32)isr##i, 0x08, GDTE_PRESENT(1) | GDTE_DPL(0) | IDTE_INT_GATE)
+
+#define SETUP_IRQ(i, j) \
+    extern void irq##i(); \
+    setup_idt_entry(j, (u32)irq##i, 0x08, GDTE_PRESENT(1) | GDTE_DPL(0) | IDTE_INT_GATE)
 
 void init_idt()
 {
+    // reprogram PICs
+    // Remap the irq table.
+    outb(0x20, 0x11);
+    outb(0xA0, 0x11);
+    outb(0x21, 0x20);
+    outb(0xA1, 0x28);
+    outb(0x21, 0x04);
+    outb(0xA1, 0x02);
+    outb(0x21, 0x01);
+    outb(0xA1, 0x01);
+    outb(0x21, 0x0);
+    outb(0xA1, 0x0);
+
     idt_ptr.limit = sizeof(idt_entries) - 1;
     idt_ptr.base = (u32)&idt_entries;
 
     memset(&idt_entries, 0, sizeof(idt_entries));
+
     SETUP_GATE(0);
     SETUP_GATE(1);
     SETUP_GATE(2);
@@ -101,6 +86,24 @@ void init_idt()
     SETUP_GATE(29);
     SETUP_GATE(30);
     SETUP_GATE(31);
+
+    SETUP_IRQ(0, 32);
+    SETUP_IRQ(1, 33);
+    SETUP_IRQ(2, 34);
+    SETUP_IRQ(3, 35);
+    SETUP_IRQ(4, 36);
+    SETUP_IRQ(5, 37);
+    SETUP_IRQ(6, 38);
+    SETUP_IRQ(7, 39);
+
+    SETUP_IRQ(8, 40);
+    SETUP_IRQ(9, 41);
+    SETUP_IRQ(10, 42);
+    SETUP_IRQ(11, 43);
+    SETUP_IRQ(12, 44);
+    SETUP_IRQ(13, 45);
+    SETUP_IRQ(14, 46);
+    SETUP_IRQ(15, 47);
 
     idt_flush((u32)&idt_ptr);
 }

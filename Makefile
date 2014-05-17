@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-std=gnu99 -Wall -fno-stack-protector -nostdlib -nostdinc -fno-builtin -I./include -m32 -g
 
-objs=boot.o main.o common.o gdt.o isr.o
+objs=boot.o main.o common.o gdt.o isr.o timer.o
 all: run
 
 run: kernel
