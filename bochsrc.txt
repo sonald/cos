@@ -1,0 +1,28 @@
+display_library: x
+
+romimage: file=$BXSHARE/BIOS-bochs-latest 
+#romimage: file=bios/seabios-1.6.3.bin
+#romimage: file=mybios.bin, address=0xfff80000 # 512k at memory top
+
+#  pentium_mmx                Intel Pentium MMX
+cpu: model=pentium_mmx, count=1, ips=5000000
+cpu: cpuid_limit_winnt=0
+
+#cpuid: x86_64=1, mmx=1, sep=1, sse=sse4_2, apic=xapic, aes=1, movbe=1, xsave=1
+#cpuid: family=6, model=0x1a, stepping=5
+
+# memory: guest=512, host=256
+
+#vgaromimage: file=bios/VGABIOS-elpin-2.40
+vgaromimage: file=$BXSHARE/VGABIOS-lgpl-latest
+#vgaromimage: file=bios/VGABIOS-lgpl-latest-cirrus
+
+#vga: extension=vbe, update_freq=5
+
+floppya: 1_44=floppy.img, status=inserted
+
+panic: action=ask
+error: action=report
+info: action=report
+debug: action=ignore, pci=report # report BX_DEBUG from module 'pci'
+
