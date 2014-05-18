@@ -2,6 +2,10 @@
 #include "common.h"
 #include "gdt.h"
 #include "timer.h"
+#include "mm.h"
+
+extern u32 mem_end_page;
+extern u32 _end;
 
 int main(struct multiboot_info *mb)
 {
@@ -9,18 +13,22 @@ int main(struct multiboot_info *mb)
     init_idt();
     init_timer();
 
-    const char* msg = "\nWelcome to COS....";
-    /*clear();*/
+    clear();
+    const char* msg = "Welcome to COS....";
     kputs(msg);
-    kputs("\n \tBooting...\n\n\nchecking....\n");
-    kputs("1\t2\t3\t4\t5\t6\t7\t8\t9\t0\t");
-    kputs(itoa(1314, 10));
-    kprintf("%s\n", "substring");
-    kprintf("%d, %d, %c, %d, %s, %c\n", 12, 34, '|', 56, "incredible", ')');
-    kprintf("va args %%d: %d, %%c: %c, %%s: %s, %d\n", 1314, '#', "substring", 798);
+    if (mb->flags & 0x1) {
+        u32 memsize = mb->low_mem + mb->high_mem;
+        mem_end_page = (memsize & 0xfffff000) + 0x1000;
+        kprintf("detected mem: low: %dKB, hi: %dKB\n", mb->low_mem, mb->high_mem);
+    }
 
-    __asm__ __volatile__ ("int $0x03");
+    init_mm();
+
     __asm__ __volatile__ ("sti");
+
+    //page fault
+    u32* invalid = (u32*)0xA0000000;
+    kputchar((char)*invalid);
 
     return 0x1BADFEED;
 }

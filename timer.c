@@ -6,7 +6,10 @@ static u32 tick = 0;
 
 static void timer_interrupt(registers_t regs)
 {
-    kprintf("tick: %d\n", tick++);
+    u16 cur = get_cursor();
+    set_cursor(CURSOR(68, 24));
+    kprintf("tick: %d", tick++);
+    set_cursor(cur);
 }
 
 void init_timer()

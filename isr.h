@@ -4,6 +4,8 @@
 #include "common.h"
 #include "gdt.h"
 
+#define PAGE_FAULT 14
+
 #define IRQ0 32 // PIT
 #define IRQ1 33 // KBD
 #define IRQ2 34 // slave

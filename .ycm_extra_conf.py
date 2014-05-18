@@ -5,15 +5,16 @@ import ycm_core
 # compilation database set (by default, one is not set).
 # CHANGE THIS LIST OF FLAGS. YES, THIS IS THE DROID YOU HAVE BEEN LOOKING FOR.
 flags = [
-'-Wall',
-'-fno-stack-protector -nostdlib -nostdinc -fno-builtin -m32',
 '-std=gnu99',
+'-Wall',
+'-fno-stack-protector -nostdlib -nostdinc -fno-builtin',
 '-isystem',
 '/usr/local/include',
 '-isystem',
 '/usr/include',
 '-I.',
 '-Iinclude',
+'-m32',
 ]
 
 

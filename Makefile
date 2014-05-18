@@ -1,7 +1,12 @@
 CC=gcc
-CFLAGS=-std=gnu99 -Wall -fno-stack-protector -nostdlib -nostdinc -fno-builtin -I./include -m32 -g
+CFLAGS=-std=gnu99 -Wall -fno-stack-protector -nostdlib -nostdinc -fno-builtin -I./include -m32 -g 
 
-objs=boot.o main.o common.o gdt.o isr.o timer.o
+#sources=$(wildcard *.c)
+#objs=$(patsubst %.c,%.o,$(sources))
+#objs+= boot.o
+# order is important
+objs=boot.o main.o common.o gdt.o isr.o timer.o kheap.o mm.o
+
 all: run
 
 run: kernel

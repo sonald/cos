@@ -32,4 +32,15 @@ struct multiboot_info {
     unsigned long vbe_interface_len;
 };
 
+/* The memory map. Be careful that the offset 0 is base_addr_low
+ *         but no size. */
+typedef struct memory_map_s {
+    unsigned long size;
+    unsigned long base_addr_low;
+    unsigned long base_addr_high;
+    unsigned long length_low;
+    unsigned long length_high;
+    unsigned long type;
+} memory_map_t;
+
 #endif

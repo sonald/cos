@@ -37,7 +37,7 @@ u8 inb(u16 port);
 u16 inw(u16 port);
 
 // use internal static buf, not thread-safe, do no free it
-char* itoa(int d, int base);
+char* itoa(u32 d, int base);
 
 // early vga access
 // all theses routines assume in VGA text-mode, which is guaranteed by GRUB
@@ -57,6 +57,13 @@ void kvprintf(const char* fmt, va_list args);
 
 void kputs(const char* msg);
 void kputchar(char c);
+
+#define CURSOR(x, y) (((x << 8) & 0xff00) | (y & 0x00ff))
+#define CURSORX(cur) (((cur) >> 8) & 0x00ff)
+#define CURSORY(cur) ((cur) & 0x00ff)
+
+void set_cursor(u16 cur);
+u16 get_cursor();
 void clear();
 
 #endif

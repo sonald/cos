@@ -42,7 +42,7 @@ u16 inw(u16 port)
 }
 
 
-static void set_cursor(int x, int y)
+static void set_phy_cursor(int x, int y)
 {
     u16 linear = y * 80 + x;
     outb(CRTC_ADDR_REG, CURSOR_LOCATION_HIGH_IND);
@@ -83,7 +83,7 @@ void kprintf(const char* fmt, ...)
     va_end(args);
 }
 
-char* itoa(int d, int base)
+char* itoa(u32 d, int base)
 {
     static char _early_buf[128];
     static char map[] = "0123456789ABCDEF";
@@ -100,6 +100,7 @@ char* itoa(int d, int base)
 void kvprintf(const char* fmt, va_list args)
 {
     int d = 0;
+    u32 u = 0;
     char* s = NULL;
     char c = ' ';
 
@@ -108,17 +109,21 @@ void kvprintf(const char* fmt, va_list args)
         if (ch == '%') {
             switch(*++fmt) {
                 case 'b': 
-                    d = va_arg(args, int);
-                    kputs(itoa(d, 2));
+                    u = va_arg(args, u32);
+                    kputs(itoa(u, 2));
                     break;
 
                 case 'x': 
-                    d = va_arg(args, int);
-                    kputs(itoa(d, 16));
+                    u = va_arg(args, u32);
+                    kputs(itoa(u, 16));
                     break;
 
                 case 'd': 
                     d = va_arg(args, int);
+                    if (d < 0) {
+                        kputchar('-');
+                        d = -d;
+                    }
                     kputs(itoa(d, 10));
                     break;
 
@@ -175,7 +180,7 @@ void kputchar(char c)
     }
 
     scroll(cy-24);
-    set_cursor(cx, cy);
+    set_phy_cursor(cx, cy);
 }
 
 void kputs(const char* msg)
@@ -185,6 +190,18 @@ void kputs(const char* msg)
         kputchar(*p);
         p++;
     }
+}
+
+void set_cursor(u16 cur)
+{
+    cx = max(min(CURSORX(cur), 79), 0);
+    cy = max(min(CURSORY(cur), 24), 0);
+    set_phy_cursor(cx, cy);
+}
+
+u16 get_cursor()
+{
+    return CURSOR(cx, cy);
 }
 
 void clear()
@@ -197,7 +214,7 @@ void clear()
         *(vbase + i) = blank;
     }    
     cx = 0, cy = 0;
-    set_cursor(cx, cy);
+    set_phy_cursor(cx, cy);
 }
 
 //dst and src should not overlay
